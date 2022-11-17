@@ -1,0 +1,22 @@
+{
+  "env": {
+    "es2021": true,
+    "node": true,
+    "browser": true,
+    "jest": true
+  },
+  "extends": ["airbnb", "plugin:prettier/recommended"],
+  "rules": {
+    "import/no-extraneous-dependencies": [
+      "error",
+      {
+        "devDependencies": true,
+        "optionalDependencies": false,
+        "peerDependencies": false
+      }
+    ],
+    "no-unused-vars": [1],
+    "import/extensions": ["error", "ignorePackages"],
+    "no-restricted-syntax": [1, "ForInStatement"]
+  }
+}
