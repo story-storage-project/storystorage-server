@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 const userSchema = new mongoose.Schema({
-  userName: {
+  name: {
     type: 'String',
     required: 'true',
   },
@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema({
     required: 'true',
     index: true,
   },
-  profileImageUrl: {
+  picture: {
     type: 'String',
     required: 'true',
   },
@@ -18,6 +18,7 @@ const userSchema = new mongoose.Schema({
     type: [
       {
         type: mongoose.Schema.Types.ObjectId,
+        ref: 'Story',
       },
     ],
     default: [],
