@@ -6,9 +6,7 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon app",
-    "pre-commit": "lint-staged && rm -rf .git/hooks && ln -s ../.husky .git/hooks",
-    "prepare": "husky install && husky add .husky/pre-commit 'npm run pre-commit'"
+    "dev": "nodemon app"
   },
   "author": "",
   "license": "ISC",
