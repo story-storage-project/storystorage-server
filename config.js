@@ -11,6 +11,7 @@ function required(key, defaultValue = undefined) {
 }
 
 export default {
+  nodeEnv: required('NODE_ENV'),
   serverPort: parseInt(required('PORT', 8000), 10),
   origin: required('ORIGIN'),
 

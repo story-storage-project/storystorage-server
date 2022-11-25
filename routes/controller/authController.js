@@ -30,7 +30,7 @@ const refreshTokenCookieOptions = {
   sameSite: 'lax',
 };
 
-if (process.env.NODE_ENV === 'production') {
+if (config.nodeEnv === 'production') {
   accessTokenCookieOptions.secure = true;
 }
 
@@ -87,7 +87,6 @@ export const refreshAccessTokenHandler = async (req, res, next) => {
     }
 
     const { sub: decodedId } = decoded;
-    // Check if the user exist
 
     const user = await User.findById(decodedId);
 
