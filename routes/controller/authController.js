@@ -23,6 +23,14 @@ const accessTokenCookieOptions = {
   domain: 'storystorage.me',
 };
 
+const logoutCookieOptions = {
+  maxAge: 1,
+  httpOnly: true,
+  sameSite: 'lax',
+  secure: 'true',
+  domain: 'storystorage.me',
+};
+
 const refreshTokenCookieOptions = {
   expires: new Date(
     Date.now() + refreshTokenExpiresInDay * 24 * 60 * 60 * 1000,
@@ -71,9 +79,9 @@ const signin = async (name, email, picture) => {
 };
 
 export const logout = (req, res, next) => {
-  res.cookie('accessToken', '', { maxAge: 1 });
-  res.cookie('refreshToken', '', { maxAge: 1 });
-  res.cookie('loggedIn', '', { maxAge: 1 });
+  res.cookie('refreshToken', '', logoutCookieOptions);
+  res.cookie('accessToken', '', logoutCookieOptions);
+  res.cookie('loggedIn', '', logoutCookieOptions);
 
   res.status(200).json({ result: 'success' });
 };
