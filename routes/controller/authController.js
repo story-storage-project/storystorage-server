@@ -19,6 +19,8 @@ const accessTokenCookieOptions = {
   maxAge: accessTokenExpiresInHour * 60 * 60 * 1000,
   httpOnly: true,
   sameSite: 'lax',
+  secure: 'true',
+  domain: 'storystorage.me',
 };
 
 const refreshTokenCookieOptions = {
@@ -28,6 +30,8 @@ const refreshTokenCookieOptions = {
   maxAge: refreshTokenExpiresInDay * 24 * 60 * 60 * 1000,
   httpOnly: true,
   sameSite: 'lax',
+  secure: 'true',
+  domain: 'storystorage.me',
 };
 
 if (config.nodeEnv === 'production') {
@@ -158,9 +162,8 @@ const googleOauthHandler = async (req, res, next) => {
     res.cookie('refreshToken', refreshToken, refreshTokenCookieOptions);
     res.cookie('accessToken', accessToken, accessTokenCookieOptions);
     res.cookie('loggedIn', true, {
-      expires: new Date(
-        new Date(Date.now() + accessTokenExpiresInHour * 60 * 60 * 1000),
-      ),
+      ...accessTokenCookieOptions,
+      httpOnly: false,
     });
 
     return res.redirect(`${config.origin}${pathUrl}`);
