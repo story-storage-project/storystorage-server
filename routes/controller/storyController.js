@@ -84,22 +84,21 @@ export const deleteStory = async (req, res, next) => {
     }
 
     await Story.deleteOne({ _id: targetId });
-    await user.elementList.filter(story => {
-      const { _id: userStoryId } = story;
 
-      return userStoryId !== targetId;
-    });
-
+    const storyIndexInUser = user.elementList.indexOf(targetId);
+    await user.elementList.splice(storyIndexInUser, 1);
     await user.save();
 
     res.status(204).json({ result: 'success' });
   } catch (error) {
+    console.log(error);
     next(error);
   }
 };
 
 export const patchStory = async (req, res, next) => {
   try {
+    console.log('hihi');
     const { storyId } = req.params;
 
     if (!storyId) {
