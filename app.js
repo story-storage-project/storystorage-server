@@ -18,7 +18,7 @@ app.use(
 
 app.use(express.json());
 app.use(cookieParser());
-if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
+if (config.nodeEnv === 'development') app.use(morgan('dev'));
 
 app.use('/auth', routes.authRouter);
 app.use('/user', routes.userRouter);
@@ -46,7 +46,7 @@ app.use((err, req, res, next) => {
 app.listen(config.serverPort, () => {
   console.log(`Server started on port: ${config.serverPort}`);
 
-  if (process.env.NODE_ENV !== 'test') {
+  if (config.nodeEnv !== 'test') {
     connectDB();
   }
 });
