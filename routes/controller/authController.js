@@ -14,21 +14,27 @@ const { token: tokenData } = config;
 const accessTokenExpiresInHour = tokenData.accessTokenExpiresIn.slice(0, -1);
 const refreshTokenExpiresInDay = tokenData.accessTokenExpiresIn.slice(0, -1);
 
+const httpsOption =
+  config.nodeEnv === 'production'
+    ? {
+        secure: true,
+        domain: 'storystorage.me',
+      }
+    : {};
+
 const accessTokenCookieOptions = {
   expires: new Date(Date.now() + accessTokenExpiresInHour * 60 * 60 * 1000),
   maxAge: accessTokenExpiresInHour * 60 * 60 * 1000,
   httpOnly: true,
   sameSite: 'lax',
-  secure: 'true',
-  domain: 'storystorage.me',
+  ...httpsOption,
 };
 
 const logoutCookieOptions = {
   maxAge: 1,
   httpOnly: true,
   sameSite: 'lax',
-  secure: 'true',
-  domain: 'storystorage.me',
+  ...httpsOption,
 };
 
 const refreshTokenCookieOptions = {
@@ -38,13 +44,8 @@ const refreshTokenCookieOptions = {
   maxAge: refreshTokenExpiresInDay * 24 * 60 * 60 * 1000,
   httpOnly: true,
   sameSite: 'lax',
-  secure: 'true',
-  domain: 'storystorage.me',
+  ...httpsOption,
 };
-
-if (config.nodeEnv === 'production') {
-  accessTokenCookieOptions.secure = true;
-}
 
 const signin = async (name, email, picture) => {
   let user = await User.findOne({ email }).lean();
@@ -113,10 +114,6 @@ export const refreshAccessTokenHandler = async (req, res, next) => {
     });
 
     res.cookie('accessToken', accessToken, accessTokenCookieOptions);
-    res.cookie('loggedIn', true, {
-      ...accessTokenCookieOptions,
-      httpOnly: false,
-    });
 
     return res.status(200).json({
       result: 'success',
@@ -170,7 +167,7 @@ const googleOauthHandler = async (req, res, next) => {
     res.cookie('refreshToken', refreshToken, refreshTokenCookieOptions);
     res.cookie('accessToken', accessToken, accessTokenCookieOptions);
     res.cookie('loggedIn', true, {
-      ...accessTokenCookieOptions,
+      ...refreshTokenCookieOptions,
       httpOnly: false,
     });
 
