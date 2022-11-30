@@ -98,7 +98,6 @@ export const deleteStory = async (req, res, next) => {
 
 export const patchStory = async (req, res, next) => {
   try {
-    console.log('hihi');
     const { storyId } = req.params;
 
     if (!storyId) {
@@ -110,7 +109,9 @@ export const patchStory = async (req, res, next) => {
 
     const patchData = req.body;
 
-    const foundData = await Story.findByIdAndUpdate(storyId, patchData).lean();
+    const foundData = await Story.findByIdAndUpdate(storyId, patchData, {
+      new: true,
+    }).lean();
 
     if (!foundData) {
       const error = new Error('Bad Request');
