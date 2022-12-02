@@ -1,0 +1,6 @@
+{
+  "category": "test",
+  "name": "test",
+  "html": "<div>test</div>",
+  "css": "div {\n\tcolor: red;\n}"
+}
