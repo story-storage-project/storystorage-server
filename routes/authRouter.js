@@ -1,6 +1,7 @@
 import express from 'express';
-import googleOauthHandler, {
+import {
   refreshAccessTokenHandler,
+  googleOauthHandler,
   logout,
 } from './controller/authController.js';
 

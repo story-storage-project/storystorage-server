@@ -2,12 +2,11 @@ import config from '../../config.js';
 import {
   getGoogleOauthToken,
   getGoogleUser,
-} from '../../service/session.service.js';
+} from '../../service/sessionService.js';
 import { signJwt, verifyJwt } from '../../utils/jwt.js';
 import AppError from '../../utils/appErrors.js';
 import User from '../../models/User.js';
-import Story from '../../models/Story.js';
-import templates from '../../data/templates/templates.js';
+import signin from '../../service/userService.js';
 
 const { token: tokenData } = config;
 
@@ -47,38 +46,6 @@ const refreshTokenCookieOptions = {
   ...httpsOption,
 };
 
-const signin = async (name, email, picture) => {
-  let user = await User.findOne({ email }).lean();
-  let userData = user;
-
-  if (!user) {
-    user = await User.create({ name, email, picture });
-
-    const { _id: id } = user;
-
-    const templateStories = await Promise.all(
-      templates.map(async template => {
-        const { name: temName, category, html, css } = template;
-        const newStory = await Story.create({
-          author: id,
-          name: temName,
-          category,
-          html,
-          css,
-        });
-        const { _id: storyId } = newStory;
-        return storyId;
-      }),
-    );
-
-    await user.elementList.push(...templateStories);
-    await user.save();
-    userData = await user.populate('elementList');
-  }
-
-  return userData;
-};
-
 export const logout = (req, res, next) => {
   res.cookie('refreshToken', '', logoutCookieOptions);
   res.cookie('accessToken', '', logoutCookieOptions);
@@ -91,9 +58,13 @@ export const refreshAccessTokenHandler = async (req, res, next) => {
   try {
     const { refreshToken } = req.cookies;
 
-    const decoded = verifyJwt(refreshToken, 'refreshTokenPublicKey');
-
     const message = 'Could not refresh access token';
+
+    if (!refreshToken) {
+      return next(new AppError(message, 403));
+    }
+
+    const decoded = verifyJwt(refreshToken, 'refreshTokenPublicKey');
 
     if (!decoded) {
       return next(new AppError(message, 403));
@@ -109,7 +80,7 @@ export const refreshAccessTokenHandler = async (req, res, next) => {
 
     const { _id: id } = user;
 
-    const accessToken = await signJwt({ sub: id }, 'accessTokenPrivateKey', {
+    const accessToken = signJwt({ sub: id }, 'accessTokenPrivateKey', {
       expiresIn: tokenData.accessTokenExpiresIn,
     });
 
@@ -124,16 +95,16 @@ export const refreshAccessTokenHandler = async (req, res, next) => {
   }
 };
 
-const googleOauthHandler = async (req, res, next) => {
+export const googleOauthHandler = async (req, res, next) => {
   try {
     const { code } = req.query;
     const pathUrl = req.query.state || '/';
 
     if (!code) {
-      return next(new Error('Authorization code not provided!', 401));
+      return next(new AppError('Authorization code not provided!', 401));
     }
 
-    const { id_token: idToken, access_token: accessTokens } =
+    const { id_token: googleIdToken, access_token: googleAccessToken } =
       await getGoogleOauthToken({ code });
 
     const {
@@ -141,26 +112,26 @@ const googleOauthHandler = async (req, res, next) => {
       verified_email: verifiedEmail,
       email,
       picture,
-    } = await getGoogleUser(idToken, accessTokens);
+    } = await getGoogleUser(googleIdToken, googleAccessToken);
 
     if (!verifiedEmail) {
-      return next(new Error('Google account not verified', 403));
+      return next(new AppError('Google account not verified', 403));
     }
 
-    const user = await signin(name, email, picture);
+    const user = signin(name, email, picture);
 
     if (!user) {
-      const error = new Error('Internal Server Error');
+      const error = new AppError('Internal Server Error');
       next(error);
     }
 
     const { _id: id } = user;
 
-    const accessToken = await signJwt({ sub: id }, 'accessTokenPrivateKey', {
+    const accessToken = signJwt({ sub: id }, 'accessTokenPrivateKey', {
       expiresIn: tokenData.accessTokenExpiresIn,
     });
 
-    const refreshToken = await signJwt({ sub: id }, 'refreshTokenPrivateKey', {
+    const refreshToken = signJwt({ sub: id }, 'refreshTokenPrivateKey', {
       expiresIn: tokenData.refreshTokenExpiresIn,
     });
 
