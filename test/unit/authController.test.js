@@ -1,21 +1,22 @@
 /* eslint-disable no-underscore-dangle */
 import httpMocks from 'node-mocks-http';
-import { jest } from '@jest/globals';
+// import { jest } from '@jest/globals';
 import User from '../../models/User.js';
 import {
   logout,
   refreshAccessTokenHandler,
   googleOauthHandler,
+  logoutCookieOptions,
 } from '../../routes/controller/authController.js';
 import newUser from '../mockData/user.json';
 import * as jwtUtil from '../../utils/jwt.js';
-import * as googleServiceFunction from '../../service/sessionService.js';
+import * as googleServiceFunction from '../../service/authService.js';
 import signin from '../../service/userService.js';
 
 jest.mock('../../models/User.js');
 jest.mock('../../models/Story.js');
 jest.mock('../../utils/jwt.js');
-jest.mock('../../service/sessionService.js');
+jest.mock('../../service/authService.js');
 jest.mock('../../service/userService.js');
 
 let req;
@@ -41,12 +42,6 @@ describe('authController - logout', () => {
   });
 
   it('should set as cookie initialization option', () => {
-    const logoutCookieOptions = {
-      maxAge: 1,
-      httpOnly: true,
-      sameSite: 'lax',
-    };
-
     logout(req, res, next);
 
     expect(res.cookie).toBeCalledWith('refreshToken', '', logoutCookieOptions);

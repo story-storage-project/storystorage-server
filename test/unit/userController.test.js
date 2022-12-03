@@ -1,6 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 import httpMocks from 'node-mocks-http';
-import { jest } from '@jest/globals';
+// import { jest } from '@jest/globals';
 import getMeHandler from '../../routes/controller/userController.js';
 import newUser from '../mockData/user.json';
 

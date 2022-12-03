@@ -16,11 +16,11 @@ const verifyAuth = async (req, res, next) => {
 
     const decoded = verifyJwt(accessToken, 'accessTokenPublicKey');
 
-    const { sub: decodedId } = decoded;
-
     if (!decoded) {
       return next(new AppError(`Invalid token or user doesn't exist`, 401));
     }
+
+    const { sub: decodedId } = decoded;
 
     const user = await User.findById(decodedId).populate('elementList');
 
