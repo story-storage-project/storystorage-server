@@ -2,7 +2,7 @@ import config from '../../config.js';
 import {
   getGoogleOauthToken,
   getGoogleUser,
-} from '../../service/sessionService.js';
+} from '../../service/authService.js';
 import { signJwt, verifyJwt } from '../../utils/jwt.js';
 import AppError from '../../utils/appErrors.js';
 import User from '../../models/User.js';
@@ -13,7 +13,7 @@ const { token: tokenData } = config;
 const accessTokenExpiresInHour = tokenData.accessTokenExpiresIn.slice(0, -1);
 const refreshTokenExpiresInDay = tokenData.accessTokenExpiresIn.slice(0, -1);
 
-const httpsOption =
+export const httpsOption =
   config.nodeEnv === 'production'
     ? {
         secure: true,
@@ -21,7 +21,7 @@ const httpsOption =
       }
     : {};
 
-const accessTokenCookieOptions = {
+export const accessTokenCookieOptions = {
   expires: new Date(Date.now() + accessTokenExpiresInHour * 60 * 60 * 1000),
   maxAge: accessTokenExpiresInHour * 60 * 60 * 1000,
   httpOnly: true,
@@ -29,14 +29,14 @@ const accessTokenCookieOptions = {
   ...httpsOption,
 };
 
-const logoutCookieOptions = {
+export const logoutCookieOptions = {
   maxAge: 1,
   httpOnly: true,
   sameSite: 'lax',
   ...httpsOption,
 };
 
-const refreshTokenCookieOptions = {
+export const refreshTokenCookieOptions = {
   expires: new Date(
     Date.now() + refreshTokenExpiresInDay * 24 * 60 * 60 * 1000,
   ),
@@ -144,7 +144,6 @@ export const googleOauthHandler = async (req, res, next) => {
 
     return res.redirect(`${config.origin}${pathUrl}`);
   } catch (error) {
-    console.log('Failed to authorize Google User', error);
     return res.redirect(`${config.origin}/oauth/error`);
   }
 };
