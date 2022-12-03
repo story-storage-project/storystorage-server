@@ -1,6 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 import httpMocks from 'node-mocks-http';
-import { jest } from '@jest/globals';
+// import { jest } from '@jest/globals';
 import Story from '../../models/Story.js';
 import {
   createStory,
@@ -10,6 +10,8 @@ import {
 import newUser from '../mockData/user.json';
 import newStory from '../mockData/story.json';
 import incorrectStory from '../mockData/incorrectStory.json';
+
+jest.mock('../../utils/jwt.js');
 
 let req;
 let res;
