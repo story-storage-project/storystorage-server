@@ -118,7 +118,7 @@ export const googleOauthHandler = async (req, res, next) => {
       return next(new AppError('Google account not verified', 403));
     }
 
-    const user = signin(name, email, picture);
+    const user = await signin(name, email, picture);
 
     if (!user) {
       const error = new AppError('Internal Server Error');
